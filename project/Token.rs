@@ -1,6 +1,6 @@
 use crate::Cstream::CStream;
 
-enum TokenType {
+pub enum TokenType {
     IntConstant,
     FloatConstant,
     Keyword,
@@ -19,7 +19,7 @@ pub struct Token {
 }
 
 impl Token {
-    fn new(t: &str, token_type:TokenType, line_num: i32, char_pos:i32) -> Token { // reads in file content
+    pub fn new(t: &str, token_type:TokenType, line_num: i32, char_pos:i32) -> Token { // reads in file content
         Token {
             text: t.to_string(),
             token_type: token_type, // what should its initialize be??
@@ -31,60 +31,60 @@ impl Token {
 
 }
 
-pub fn check_TokenType(text:String) -> TokenType {
-    let keywords = vec!["unsigned", "char", "short", "int", "long", "float", "double", "while", "if", "return", "void", "main"];
-    // Keyword
-    if keywords.contains(&&*text) {
-        return TokenType::Keyword;
-    }
+// pub fn check_TokenType(text:String) -> TokenType {
+//     let keywords = vec!["unsigned", "char", "short", "int", "long", "float", "double", "while", "if", "return", "void", "main"];
+//     // Keyword
+//     if keywords.contains(&&*text) {
+//         return TokenType::Keyword;
+//     }
 
-    // Identifier
-    if text.chars().nth(0).unwrap() == '_' || (text.chars().nth(0).unwrap()).is_alphabetic() {
-        if text.len() == 1 {
-            return TokenType::Identifier;
-        }
-        for c in 1..text.to_string().len() {
-            if text.chars().nth(c).unwrap() != '_' && !((text.chars().nth(0).unwrap()).is_alphanumeric()) {
-                return TokenType::Invalid;
-            }
-        }
-        return TokenType::Identifier;
-    }
+//     // Identifier
+//     if text.chars().nth(0).unwrap() == '_' || (text.chars().nth(0).unwrap()).is_alphabetic() {
+//         if text.len() == 1 {
+//             return TokenType::Identifier;
+//         }
+//         for c in 1..text.to_string().len() {
+//             if text.chars().nth(c).unwrap() != '_' && !((text.chars().nth(0).unwrap()).is_alphanumeric()) {
+//                 return TokenType::Invalid;
+//             }
+//         }
+//         return TokenType::Identifier;
+//     }
 
 
-    // IntConstant
-    let dotCount = 0;
-    // checks if the first two characters are (-) digit
-    if text.chars().nth(0).unwrap() == '-' || (text.chars().nth(0).unwrap()).is_digit(10) {
-        if text.len() == 1 { // only digit
-            if (text.chars().nth(0).unwrap()).is_digit(10) {
-                return TokenType::IntConstant;
-            }
-            return TokenType::Invalid;
-        }
-        // checks if the rest of the characters are digit.{digit}
-        for c in 1..text.to_string().len() {
-            if !((text.chars().nth(0).unwrap()).is_digit(10)) {
-                if text.chars().nth(c).unwrap() == '.' && c !=  text.len() - 1{
-                    dotCount += 1;
-                }
-                return TokenType::Invalid;
-            }
-        }
-        if dotCount == 0 {
-            return TokenType::IntConstant;
-        }
-        if dotCount == 1 {
-            return TokenType::FloatConstant;
-        }
-        else {
-            return TokenType::Invalid;
-        }
-    }
-    else {
-        return TokenType::Invalid;
-    }
-}
+//     // IntConstant
+//     let dotCount = 0;
+//     // checks if the first two characters are (-) digit
+//     if text.chars().nth(0).unwrap() == '-' || (text.chars().nth(0).unwrap()).is_digit(10) {
+//         if text.len() == 1 { // only digit
+//             if (text.chars().nth(0).unwrap()).is_digit(10) {
+//                 return TokenType::IntConstant;
+//             }
+//             return TokenType::Invalid;
+//         }
+//         // checks if the rest of the characters are digit.{digit}
+//         for c in 1..text.to_string().len() {
+//             if !((text.chars().nth(0).unwrap()).is_digit(10)) {
+//                 if text.chars().nth(c).unwrap() == '.' && c !=  text.len() - 1{
+//                     dotCount += 1;
+//                 }
+//                 return TokenType::Invalid;
+//             }
+//         }
+//         if dotCount == 0 {
+//             return TokenType::IntConstant;
+//         }
+//         if dotCount == 1 {
+//             return TokenType::FloatConstant;
+//         }
+//         else {
+//             return TokenType::Invalid;
+//         }
+//     }
+//     else {
+//         return TokenType::Invalid;
+//     }
+// }
 
     // fn get_next_char(&mut self) -> Option<char> {
         
