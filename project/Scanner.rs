@@ -1,4 +1,5 @@
 
+
 extern crate custom_error;
 use crate::Token::Token;
 use crate::Token::TokenType;
@@ -15,6 +16,7 @@ pub struct Scanner {
     char_pos: i32,
 }
 
+
 impl Scanner {
     pub fn new(file: String) -> Scanner {
         Scanner{
@@ -25,7 +27,7 @@ impl Scanner {
     }
 
 
-    fn get_cur_token(mut self, token:String, line_num:i32, char_pos:i32) -> Token { // check token type & call Token
+    fn get_cur_token(mut self, token: String, line_num:i32, char_pos:i32) -> Token { // check token type & call Token
             let token_type = check_TokenType(token.to_owned());
             Token::new(&*token, token_type, line_num, char_pos)
 
@@ -34,7 +36,8 @@ impl Scanner {
     
     // using content from Cstream use get_next_char to get the char and call get_cur_token to return Token Type and save it into a vector and return
     fn get_all_tokens(mut self, file:String) -> Vec<Token> {
-        let mut token: String = "".to_string(); 
+        let mut token: &mut String = &mut "".to_string(); 
+        
         let mut char_index: i32 = 0;
         let operators = vec!["(", ",", ")", "{", "}", "=", "==", "<", ">", "<=", ">=", "!=", "+", "-", "*", "/", ";"];
 
@@ -46,19 +49,20 @@ impl Scanner {
                 continue;
             }
             if c == file.to_string().len()-1 { // end of file
-                token.push(file.chars().nth(c).unwrap()); // }
+                token.push_str(&file.chars().nth(c).unwrap().to_string()); // }
+                //token = + &file.chars().nth(c).unwrap().to_string();
                 //go back, for now assume the last char would always be '}'
                 char_index = char_index + 1;
                 self.char_pos = char_index;
-                self.all_tokens.push(self.get_cur_token(token, self.line_num, self.char_pos));
+                self.all_tokens.push(self.get_cur_token(*token, self.line_num, self.char_pos));
                 
                 // go back, return the vector <all_tokens>
                 return self.all_tokens;
             }
-            
+
             if file.chars().nth(c).unwrap() == ' ' {
-                self.all_tokens.push(self.get_cur_token(token, self.line_num, self.char_pos));
-                token = "".to_string();
+                self.all_tokens.push(self.get_cur_token(*token, self.line_num, self.char_pos));
+                token = &mut "".to_string(); 
                 
                 char_index = char_index + 1;
                 self.char_pos = char_index;
@@ -70,13 +74,13 @@ impl Scanner {
             
             if operators.contains(&&*(file.chars().nth(c).unwrap().to_string()).to_string()) {
                 // token before operator
-                self.all_tokens.push(self.get_cur_token(token, self.line_num, self.char_pos));
+                all_tokens.push(self.get_cur_token(*token, self.line_num, self.char_pos));
                 // operator
-                token = "".to_string();
+                token = &mut "".to_string(); 
                 token.push(file.chars().nth(c).unwrap());
                 char_index = char_index + 1;
                 self.char_pos = char_index;
-                self.all_tokens.push(self.get_cur_token(token, self.line_num, self.char_pos));
+                self.all_tokens.push(self.get_cur_token(*token, self.line_num, self.char_pos));
 
 
             }
