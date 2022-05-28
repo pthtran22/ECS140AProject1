@@ -8,6 +8,11 @@ struct Parser {
 }
 
 impl Parser {
+    pub new (&mut self, all_tokens: &mut Vec<Token>) -> Parser {
+        Parser {
+            allToken: all_tokens,
+        }
+    }
     fn lookAhead (&mut self, index:i32) -> Token{
         return allToken[index + 1];
     }
