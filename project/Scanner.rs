@@ -37,6 +37,8 @@ impl Scanner {
     // using content from Cstream use get_next_char to get the char and call get_cur_token to return Token Type and save it into a vector and return
     pub fn get_all_tokens(&mut self) -> &mut Vec<Token> {
 
+        // let mut space_count = 0;
+
         let mut token: &mut String = &mut "".to_string(); 
         let mut char_index: i32 = 0;
         let operators = vec!["(", ",", ")", "{", "}", "=", "==", "<", ">", "<=", ">=", "!=", "+", "-", "*", "/", ";"];
@@ -51,6 +53,7 @@ impl Scanner {
             if self.file.chars().nth(c).unwrap() == '\n' {
                 self.line_num += 1;
                 char_index = -1;
+                flag_space = 0;
                 continue;
             }
 
@@ -67,25 +70,44 @@ impl Scanner {
                 return &mut self.all_tokens;
             }
 
-            else if self.file.chars().nth(c).unwrap() == ' ' {  // float Foo
-                
+            else if self.file.chars().nth(c).unwrap() == ' ' {  // float Foo  "_ _ _ _"
+                // space_count = space_count + 1;
+                // println!("{}",space_count);
+
                 if flag_space == 0 {
                     // push token before ' '
+                    if token.is_empty() {
+                        char_index = char_index + 1;
+                        continue;
+                    }
+                    
+                    self.char_pos = char_index;
+                    // println!("{}", char_index);
+
                     let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
                     self.all_tokens.push(token_obj);
                     char_index = char_index + 1;
+
+                    // println!("{}", char_index);
                 
                     *token = "".to_string();
                     char_index = char_index + 1;
                     self.char_pos = char_index;
+
+                    // println!("{}", char_index);
                     
                     flag_space = 1;
                 }
                 else {
+                    if token.is_empty() {
+                        char_index = char_index + 1;
+                        continue;
+                    }
                     let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
                     self.all_tokens.push(token_obj);
                     *token = "".to_string();
                     self.char_pos = char_index;
+                    println!("{}", char_index);
 
                 }
                 
@@ -103,8 +125,12 @@ impl Scanner {
                     char_index = char_index + 1;
                     *token = "".to_string();
 
+                    continue;
                     
                 }
+
+                
+
 
                 // token before operator
                 let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
@@ -128,6 +154,7 @@ impl Scanner {
             }
 
             else if (self.file.chars().nth(c).unwrap()).is_alphanumeric() || self.file.chars().nth(c).unwrap().to_string() == "." || self.file.chars().nth(c).unwrap().to_string() == "_" {
+            
                 token.push(self.file.chars().nth(c).unwrap());
                 char_index = char_index + 1;
                 
@@ -154,12 +181,17 @@ pub fn check_TokenType(text:String) -> TokenType {
     if text.is_empty() {
         return TokenType::Invalid;
     }
-
+    let operators = vec!["(", ",", ")", "{", "}", "=", "==", "<", ">", "<=", ">=", "!=", "+", "-", "*", "/", ";"];
     let keywords = vec!["unsigned", "char", "short", "int", "long", "float", "double", "while", "if", "return", "void", "main"];
     // Keyword
     if keywords.contains(&&*text) {
         return TokenType::Keyword;
     }
+
+    if operators.contains(&&*text) {
+        return TokenType::Operator;
+    }
+
 
     // Identifier
     if text.chars().nth(0).unwrap() == '_' || (text.chars().nth(0).unwrap()).is_alphabetic() {
