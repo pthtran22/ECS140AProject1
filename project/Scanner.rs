@@ -100,7 +100,7 @@ impl Scanner {
                 }
                 
                 else {
-                    // if whitespace in the middle, e.g. float_Foo
+                    // if whitespace in the middle, e.g. float_Foo, value_=_
                     // push float
                     if token.is_empty() {
                         char_index = char_index + 1;
@@ -124,13 +124,35 @@ impl Scanner {
             
             else if operators.contains(&&*(self.file.chars().nth(c).unwrap().to_string()).to_string()) {
                 after_newline = 0;
-                // Foo(int 
+                // Foo(int or value_=_Foo
                 if flag_cont_operator == 0 {
+
                     flag_cont_operator = flag_cont_operator + 1;
                     // push Foo
                     if token.is_empty() {
                         token.push(self.file.chars().nth(c).unwrap());
                     }
+
+                    // e.g. value_=_ skip whitespace before =
+                    if c != 0 && self.file.chars().nth(c-1).unwrap() == ' ' {
+                        // push operator =
+                        *token = "".to_string();
+                        self.char_pos = char_index;
+                        token.push(self.file.chars().nth(c).unwrap());
+                        if token.is_empty() {
+                            token.push(self.file.chars().nth(c).unwrap());
+                        }
+                       
+                        let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
+                        self.all_tokens.push(token_obj);
+                        char_index = char_index + 1;
+                        self.char_pos = char_index;
+                        *token = "".to_string();
+
+                        continue;
+                        
+                    }
+                    
                     let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
                     self.all_tokens.push(token_obj);
 
@@ -141,6 +163,7 @@ impl Scanner {
                     if token.is_empty() {
                         token.push(self.file.chars().nth(c).unwrap());
                     }
+                
                     let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
                     self.all_tokens.push(token_obj);
                     char_index = char_index + 1;
