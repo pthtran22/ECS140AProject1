@@ -131,7 +131,9 @@ impl Scanner {
                     self.all_tokens.push(token_obj);
                     flag_cont_operator = flag_cont_operator + 1;
                     *token = "".to_string();
+                    char_index = char_index + 1;
                     self.char_pos = char_index;
+                    
 
                    
 
