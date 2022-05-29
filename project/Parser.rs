@@ -273,22 +273,32 @@ impl Parser {
 
     fn Assignment (&mut self) -> bool {
         println!("\nInside Assignment()");
-        let index_usize: usize = self.index as usize;
-        println!("{}", self.allToken[index_usize].text);
+        let mut index_usize: usize = self.index as usize;
+        println!("cur text '{}'", self.allToken[index_usize].text);
         if self.allToken[index_usize].token_type == TokenType::Identifier {
             println!("correct identifier");
+            println!("cur text '{}'", self.allToken[index_usize].text);
             self.index = self.index + 1;
-            let index_usize: usize = self.index as usize;
+            
+            index_usize = self.index as usize;
+            println!("next text after identifier {}", self.allToken[index_usize].text);
             if self.allToken[index_usize].text == "=" {
-                println!("correct =");
+                println!("index before: '{}'", self.index);
                 self.index = self.index + 1;
+                println!("index after: '{}'", self.index);
+                index_usize = self.index as usize;
+                println!("usize: '{}'", index_usize);
+
+                println!("should be text after after identifier '{}'", self.allToken[index_usize].text);
+                // println!("next text after after identifier '{}'", self.allToken[index_usize+1].text);
+                // self.index = self.index + 1;
                 while true {
                     println!("in while");
-                    let index_usize: usize = self.index as usize;
+                    index_usize = self.index as usize;
                     if self.allToken[index_usize].token_type == TokenType::Identifier {
                         println!("correct identifier");
                         self.index = self.index + 1;
-                        let index_usize: usize = self.index as usize;
+                        index_usize = self.index as usize;
                         if self.allToken[index_usize].text == "=" {
                             self.index = self.index + 1;
                         }
@@ -296,17 +306,18 @@ impl Parser {
                     }
                     break;
                 }
-            }
-            println!("no =");
-            if self.Expression() == true {
-                println!("good express");
-                let index_usize: usize = self.index as usize;
-                if self.allToken[index_usize].text == ";" {
-                    self.index = self.index + 1;
-                    return true;
+                println!("after break");
+                println!("{}", self.allToken[index_usize].text);
+                if self.Expression() == true {
+                    println!("good express");
+                    let index_usize: usize = self.index as usize;
+                    if self.allToken[index_usize].text == ";" {
+                        self.index = self.index + 1;
+                        return true;
+                    }
                 }
-            }
-            
+                return false;
+            }   
         }
         println!("failed identifier");
         return false;
@@ -438,7 +449,7 @@ impl Parser {
         let index_usize: usize = self.index as usize;
         println!("{}", self.allToken[index_usize].text);
         if self.allToken[index_usize].text == "(" {
-            println!("( true")
+            println!("( true");
             self.index = self.index + 1;
             let index_usize: usize = self.index as usize;
             if self.Expression() == true {
