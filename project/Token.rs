@@ -1,6 +1,5 @@
 use crate::Cstream::CStream;
-#[derive(Copy, Clone)]
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum TokenType {
     IntConstant,
     FloatConstant,
@@ -11,7 +10,7 @@ pub enum TokenType {
     Init,
 }
 
- 
+#[derive(Clone)]
 pub struct Token {
     pub text: String,
     pub token_type: TokenType,
