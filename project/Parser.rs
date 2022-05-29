@@ -274,14 +274,19 @@ impl Parser {
     fn Assignment (&mut self) -> bool {
         println!("\nInside Assignment()");
         let index_usize: usize = self.index as usize;
+        println!("{}", self.allToken[index_usize].text);
         if self.allToken[index_usize].token_type == TokenType::Identifier {
+            println!("correct identifier");
             self.index = self.index + 1;
             let index_usize: usize = self.index as usize;
             if self.allToken[index_usize].text == "=" {
+                println!("correct =");
                 self.index = self.index + 1;
                 while true {
+                    println!("in while");
                     let index_usize: usize = self.index as usize;
                     if self.allToken[index_usize].token_type == TokenType::Identifier {
+                        println!("correct identifier");
                         self.index = self.index + 1;
                         let index_usize: usize = self.index as usize;
                         if self.allToken[index_usize].text == "=" {
@@ -289,15 +294,21 @@ impl Parser {
                         }
                         return false;
                     }
-                }
-                if self.Expression() == true {
-                    if self.allToken[index_usize].text == ";" {
-                        self.index = self.index + 1;
-                        return true;
-                    }
+                    break;
                 }
             }
+            println!("no =");
+            if self.Expression() == true {
+                println!("good express");
+                let index_usize: usize = self.index as usize;
+                if self.allToken[index_usize].text == ";" {
+                    self.index = self.index + 1;
+                    return true;
+                }
+            }
+            
         }
+        println!("failed identifier");
         return false;
     }
 
@@ -367,8 +378,11 @@ impl Parser {
     fn Expression (&mut self) -> bool {
         println!("\nInside Expression()");
         if self.SimpleExpression() == true {
+            println!("\nsimpleExpression() true");
             if self.RelationOperator() == true {
+                println!("\nOperator() true");
                 if self.SimpleExpression() == true {
+                    println!("\nSimpleExpression() true");
                     return true;
                 }
                 return false;
@@ -381,10 +395,12 @@ impl Parser {
     fn SimpleExpression (&mut self) -> bool {
         println!("\nInside SimpleExpression()");
         if self.Term() == true {
+            println!("\nterm true");
             while true {
                 if self.AddOperator() == true {
-
+                    println!("\nadd operator true");
                     if self.Term() == true {
+                        println!("\nterm true");
                         continue;
                     }
                     return false;
@@ -399,9 +415,12 @@ impl Parser {
     fn Term (&mut self) -> bool {
         println!("\nInside Term()");
         if self.Factor() == true {
+            println!("\nfactor() true");
             while true {
                 if self.MultOperator() == true {
+                    println!("\nMultOperator() true");
                     if self.Factor() == true {
+                        println!("\nfactor() true");
                         continue;
                     }
                     return false;
@@ -415,8 +434,11 @@ impl Parser {
 
     fn Factor (&mut self) -> bool {
         println!("\nInside Factor()");
+        
         let index_usize: usize = self.index as usize;
+        println!("{}", self.allToken[index_usize].text);
         if self.allToken[index_usize].text == "(" {
+            println!("( true")
             self.index = self.index + 1;
             let index_usize: usize = self.index as usize;
             if self.Expression() == true {
@@ -428,14 +450,18 @@ impl Parser {
             }
         }
         if self.Constant() == true {
+            println!("constant() true");
             return true;
         }
         // Foo () or Foo (e, f, g, h) or    CHECK ABT Foo &
         if self.allToken[index_usize].token_type == TokenType::Identifier {
+            println!("\nidentifier true");
             if self.allToken[index_usize].text == "(" {
+                println!("\n( true");
                 self.index = self.index + 1;
                 let index_usize: usize = self.index as usize;
                 if self.Expression() == true {
+                    println!("\nexpression() true");
                     // {, Expression}
                     while true {
                         if self.allToken[index_usize].text == "," {
