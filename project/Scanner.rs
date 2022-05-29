@@ -43,6 +43,7 @@ impl Scanner {
         let mut flag_space = 0;
         let mut flag_first_non_space = 0;
         let mut flag_cont_operator = 0;
+        let mut after_newline = 0;
 
 
         
@@ -55,6 +56,7 @@ impl Scanner {
             // check for newline
             if self.file.chars().nth(c).unwrap() == '\n' {
                 flag_cont_operator = 0;
+                after_newline = 1;
 
                 self.line_num += 1;
                 char_index = -1;
@@ -66,6 +68,7 @@ impl Scanner {
 
             else if c == self.file.to_string().len()-1 { // end of file
                 flag_cont_operator = 0;
+                after_newline = 0;
                 if flag_space == 0 {
                     self.char_pos = char_index;
                 }
@@ -84,28 +87,50 @@ impl Scanner {
             else if self.file.chars().nth(c).unwrap() == ' ' {  // float Foo  "_ _ _ _"
                 
                 flag_cont_operator = 0;
-                // if whitespace in the middle, e.g. float_Foo
-                // push float
-                let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
-                self.all_tokens.push(token_obj);
-                *token = "".to_string();
 
-
+                // if whitespace after newline (indentation) e.g. _ _ _ _ float
                 // skip whitespace
-                char_index = char_index + 1;
-                *token = "".to_string();
-                self.char_pos = char_index;
+                if after_newline == 1 {
+                    if char_index == -1 {
+                        char_index = char_index + 1;
+                    }
+                    char_index = char_index + 1;
+                    self.char_pos = char_index;
+                    continue;
+                }
+                
+                else {
+                    // if whitespace in the middle, e.g. float_Foo
+                    // push float
+                    if token.is_empty() {
+                        char_index = char_index + 1;
+                        self.char_pos = char_index;
+                        continue;
+                    }
+                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
+                    self.all_tokens.push(token_obj);
+                    *token = "".to_string();
+
+
+                    // skip whitespace
+                    char_index = char_index + 1;
+                    *token = "".to_string();
+                    self.char_pos = char_index;
+                }
 
 
             }
 
             
             else if operators.contains(&&*(self.file.chars().nth(c).unwrap().to_string()).to_string()) {
-                
+                after_newline = 0;
                 // Foo(int 
                 if flag_cont_operator == 0 {
                     flag_cont_operator = flag_cont_operator + 1;
                     // push Foo
+                    if token.is_empty() {
+                        token.push(self.file.chars().nth(c).unwrap());
+                    }
                     let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
                     self.all_tokens.push(token_obj);
 
@@ -113,6 +138,9 @@ impl Scanner {
                     *token = "".to_string();
                     self.char_pos = char_index;
                     token.push(self.file.chars().nth(c).unwrap());
+                    if token.is_empty() {
+                        token.push(self.file.chars().nth(c).unwrap());
+                    }
                     let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
                     self.all_tokens.push(token_obj);
                     char_index = char_index + 1;
@@ -144,7 +172,7 @@ impl Scanner {
             }
 
             else if (self.file.chars().nth(c).unwrap()).is_alphanumeric() || self.file.chars().nth(c).unwrap().to_string() == "." || self.file.chars().nth(c).unwrap().to_string() == "_" {
-                
+                after_newline = 0;
                 flag_cont_operator = 0;
                 // first non whitespace char, e.g. _ _ _ _ float
                 if flag_space == 0 && char_index == -1 {
