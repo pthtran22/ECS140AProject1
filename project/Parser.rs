@@ -1,23 +1,26 @@
+
 use crate::Token::Token;
+use crate::Token::TokenType;
 
-let mut index : i32 = 0;
+static index : i32 = 0;
 
-struct Parser {
+
+pub struct Parser {
     allToken : Vec<Token>,
 
 }
 
 impl Parser {
-    pub new (&mut self, all_tokens: &mut Vec<Token>) -> Parser {
+    pub fn new (all_tokens: Vec<Token>) -> Parser {
         Parser {
             allToken: all_tokens,
         }
     }
-    fn lookAhead (&mut self, index:i32) -> Token{
-        return allToken[index + 1];
-    }
+    // fn lookAhead (&mut self, index:i32) -> Token{
+    //     return allToken[index + 1];
+    // }
 
-    fn Program (&mut self){
+    pub fn Program (&mut self) ->  bool {
         while self.Declaration() == true {
             self.Declaration();
         }
@@ -40,13 +43,14 @@ impl Parser {
     }
 
     fn MainDeclaration (&mut self) -> bool {
-        if self.allTokens[index].text == "void" {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "void" {
             index = index + 1;
-            if self.allTokens[index].text == "main" {
+            if self.allToken[index_usize].text == "main" {
                 index = index + 1;
-                if self.allTokens[index].text == "(" {
+                if self.allToken[index_usize].text == "(" {
                     index = index + 1;
-                    if self.allTokens[index].text == ")" {
+                    if self.allToken[index_usize].text == ")" {
                         index = index + 1;
                         if self.Block() == true {
                             return true;
@@ -70,8 +74,9 @@ impl Parser {
     }
 
     fn DeclarationType (&mut self) -> bool {
+        let index_usize: usize = index as usize;
         if self.DataType() == true {
-            if self.allTokens[index].token_type == TokenType::Identifier {
+            if self.allToken[index_usize].token_type == TokenType::Identifier {
                 index = index + 1;
                 return true;
             }
@@ -80,15 +85,17 @@ impl Parser {
     }
 
     fn VariableDeclaration (&mut self) -> bool {
-        if self.allTokens[index].text == ";" {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == ";" {
             index = index + 1;
             return true;
         }
 
-        if self.allTokens[index].text == "=" {
+        if self.allToken[index_usize].text == "=" {
+            let index_usize: usize = index as usize;
             index = index + 1;
             if self.Constant() == true {
-                if self.allTokens[index].text == ";" {
+                if self.allToken[index_usize].text == ";" {
                     index = index + 1;
                     return true;
                 }
@@ -98,8 +105,9 @@ impl Parser {
     }
 
     fn FunctionDeclaration (&mut self) -> bool {
+        let index_usize: usize = index as usize;
         if self.ParameterBlock() == true {
-            if self.allTokens[index].text == ";" {
+            if self.allToken[index_usize].text == ";" {
                 index = index + 1;
                 return true;
             }
@@ -108,19 +116,20 @@ impl Parser {
     }
 
     fn Block(&mut self) -> bool {
-        if self.allTokens[index].text == "{" {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "{" {
             index = index + 1;
             while self.Declaration() == true {
-                self.Declaration()
+                self.Declaration();
             }
             while self.Statement() == true {
-                self.Statement()
+                self.Statement();
             }
             while self.FunctionDeclaration() == true {
-                self.FunctionDeclaration()
+                self.FunctionDeclaration();
             }
-            if self.allTokens[index].text == "}" {
-                index = index + 1
+            if self.allToken[index_usize].text == "}" {
+                index = index + 1;
                 return true;
             } 
         }
@@ -128,13 +137,14 @@ impl Parser {
     }
 
     fn ParameterBlock (&mut self) -> bool {
-        if self.allTokens[index].text == "(" {
-            index = index + 1
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "(" {
+            index = index + 1;
             // [Parameter {, Parameter}]
             if self.Parameter() == true {
                 // {, Parameter}
                 while true {
-                    if self.allTokens[index].text == "," {
+                    if self.allToken[index_usize].text == "," {
                         index = index + 1;
                         if self.Parameter() == true {
                             continue;
@@ -145,7 +155,7 @@ impl Parser {
                 }
             }
         }
-        if self.allTokens[index].text == ")" {
+        if self.allToken[index_usize].text == ")" {
             index = index + 1;
             return true;
         }
@@ -160,7 +170,8 @@ impl Parser {
     }
 
     fn Constant (&mut self) -> bool {
-        if self.allTokens[index].token_type == TokenType::IntConstant || self.allTokens[index].token_type == TokenType::FloatConstant {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].token_type == TokenType::IntConstant || self.allToken[index_usize].token_type == TokenType::FloatConstant {
             index = index + 1;
             return true;
         }
@@ -168,9 +179,10 @@ impl Parser {
     }
 
     fn Statement (&mut self) -> bool {
-        if self.Assignment() == true || self.WhileLoop() == true || self.IfStatement() == true || self.ReturnStatement() == true || self.Expression == true {
+        let index_usize: usize = index as usize;
+        if self.Assignment() == true || self.WhileLoop() == true || self.IfStatement() == true || self.ReturnStatement() == true || self.Expression() == true {
             if self.Expression() == true {
-                if self.allTokens[index].text == ";" {
+                if self.allToken[index_usize].text == ";" {
                     index = index + 1;
                     return true;
                 }
@@ -182,8 +194,9 @@ impl Parser {
     }
 
     fn Parameter (&mut self) -> bool {
+        let index_usize: usize = index as usize;
         if self.DataType() == true {
-            if self.allTokens[index].token_type == TokenType::Identifier {
+            if self.allToken[index_usize].token_type == TokenType::Identifier {
                 index = index + 1;
                 return true;
             }
@@ -192,21 +205,22 @@ impl Parser {
     }
 
     fn Assignment (&mut self) -> bool {
-        if self.allTokens[index].token_type == TokenType::Identifier {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].token_type == TokenType::Identifier {
             index = index + 1;
-            if self.allTokens[index].text == "=" {
+            if self.allToken[index_usize].text == "=" {
                 index = index + 1;
                 while true {
-                    if self.allTokens[index].token_type == TokenType::Identifier {
+                    if self.allToken[index_usize].token_type == TokenType::Identifier {
                         index = index + 1;
-                        if self.allTokens[index].text == "=" {
+                        if self.allToken[index_usize].text == "=" {
                             index = index + 1;
                         }
                         return false;
                     }
                 }
                 if self.Expression() == true {
-                    if self.allTokens[index].text == ";" {
+                    if self.allToken[index_usize].text == ";" {
                         index = index + 1;
                         return true;
                     }
@@ -217,12 +231,13 @@ impl Parser {
     }
 
     fn WhileLoop (&mut self) -> bool {
-        if self.allTokens[index].text == "while" {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "while" {
             index = index + 1;
-            if self.allTokens[index].text == "(" {
+            if self.allToken[index_usize].text == "(" {
                 index = index + 1;
                 if self.Expression() == true {
-                    if self.allTokens[index].text == ")"{
+                    if self.allToken[index_usize].text == ")"{
                         index = index + 1;
                         if self.Block() == true {
                             return true;
@@ -234,13 +249,14 @@ impl Parser {
         return false;
     }
 
-    fn IfStatement (&mut self, token:Token){
-        if self.allTokens[index].text == "if" {
+    fn IfStatement (&mut self) -> bool {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "if" {
             index = index + 1;
-            if self.allTokens[index].text == "(" {
+            if self.allToken[index_usize].text == "(" {
                 index = index + 1;
                 if self.Expression() == true {
-                    if self.allTokens[index].text == ")"{
+                    if self.allToken[index_usize].text == ")"{
                         index = index + 1;
                         if self.Block() == true {
                             return true;
@@ -253,10 +269,11 @@ impl Parser {
     }
 
     fn ReturnStatement (&mut self) -> bool {
-        if self.allTokens[index].text == "return" {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "return" {
             index = index + 1;
             if self.Expression() == true {
-                if self.allTokens[index].text == ";" {
+                if self.allToken[index_usize].text == ";" {
                     index = index + 1;
                     return true;
                 }
@@ -311,10 +328,11 @@ impl Parser {
     }
 
     fn Factor (&mut self) -> bool {
-        if self.allTokens[index].text == "(" {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "(" {
             index = index + 1;
             if self.Expression() == true {
-                if self.allTokens[index].text == ")" {
+                if self.allToken[index_usize].text == ")" {
                     index = index + 1;
                     return true;
                 }   
@@ -324,13 +342,13 @@ impl Parser {
             return true;
         }
         // Foo () or Foo (e, f, g, h) or    CHECK ABT Foo &
-        if self.Identifier() == true {
-            if self.allTokens[index].text == "(" {
+        if self.allToken[index_usize].token_type == TokenType::Identifier {
+            if self.allToken[index_usize].text == "(" {
                 index = index + 1;
                 if self.Expression() == true {
                     // {, Expression}
                     while true {
-                        if self.allTokens[index].text == "," {
+                        if self.allToken[index_usize].text == "," {
                             index = index + 1;
                             if self.Expression() == true {
                                 continue;
@@ -339,13 +357,13 @@ impl Parser {
                         }
                         break;
                     }
-                    if self.allTokens[index].text == ")" {
+                    if self.allToken[index_usize].text == ")" {
                         index = index + 1;
                         return true;
                     }
                     return false;
                 }
-                if self.allTokens[index].text == ")" {
+                if self.allToken[index_usize].text == ")" {
                     index = index + 1;
                     return true;
                 }
@@ -357,16 +375,17 @@ impl Parser {
     }
 
     fn IntegerType (&mut self) -> bool {
+        let index_usize: usize = index as usize;
         // char | short | int | long
-        if self.allToken[index].text == "unsigned" {
+        if self.allToken[index_usize].text == "unsigned" {
             index = index + 1;
-            if self.allToken[index].text == "char" || self.allToken[index].text == "short" || self.allToken[index].text == "int" || self.allToken[index].text == "long" {
+            if self.allToken[index_usize].text == "char" || self.allToken[index_usize].text == "short" || self.allToken[index_usize].text == "int" || self.allToken[index_usize].text == "long" {
                 index = index + 1;
                 return true;
             }
             return false;
         }
-        if self.allToken[index].text == "char" || self.allToken[index].text == "short" || self.allToken[index].text == "int" || self.allToken[index].text == "long" {
+        if self.allToken[index_usize].text == "char" || self.allToken[index_usize].text == "short" || self.allToken[index_usize].text == "int" || self.allToken[index_usize].text == "long" {
             index = index + 1;
             return true;
         }
@@ -374,7 +393,8 @@ impl Parser {
     }
 
     fn FloatType(&mut self) -> bool{
-        if self.allToken[index].text == "float" || self.allToken[index].text == "double" {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "float" || self.allToken[index_usize].text == "double" {
             index = index + 1;
             return true
         }
@@ -382,7 +402,8 @@ impl Parser {
     }
 
     fn RelationOperator(&mut self) -> bool {
-        if self.allToken[index].text == "==" || self.allToken[index].text == "<" || self.allToken[index].text == ">" || self.allToken[index].text == "<=" || self.allToken[index].text == ">=" || self.allToken[index].text == "!=" {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "==" || self.allToken[index_usize].text == "<" || self.allToken[index_usize].text == ">" || self.allToken[index_usize].text == "<=" || self.allToken[index_usize].text == ">=" || self.allToken[index_usize].text == "!=" {
             index = index + 1;
             return true;
         }
@@ -390,7 +411,8 @@ impl Parser {
     }
 
     fn AddOperator(&mut self) -> bool {
-        if self.allToken[index].text == "+" || self.allToken[index].text == "-" { // do we need to create a funciton that gets text
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "+" || self.allToken[index_usize].text == "-" { // do we need to create a funciton that gets text
             index = index + 1;
             return true;
         }
@@ -398,7 +420,8 @@ impl Parser {
     }
 
     fn MultOperator (&mut self) -> bool {
-        if self.allToken[index].text == "*" || self.allToken[index].text == "/" {
+        let index_usize: usize = index as usize;
+        if self.allToken[index_usize].text == "*" || self.allToken[index_usize].text == "/" {
             index = index + 1;
             return true;
         }
