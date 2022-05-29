@@ -55,24 +55,13 @@ impl Scanner {
             // check for newline
             if self.file.chars().nth(c).unwrap() == '\n' {
                 flag_cont_operator = 0;
-                // handle ____float/n
-                if flag_first_non_space != 0 {
-                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
-                    self.all_tokens.push(token_obj);
-                    flag_first_non_space = 0;
-                }
 
                 self.line_num += 1;
                 char_index = -1;
                 flag_space = 0;
-                // flag_first_non_space = 0;
-
-                if c != self.file.to_string().len()-1 {
-                    continue;
-                }
-                else {
-                    return &mut self.all_tokens;
-                }
+                flag_cont_operator = 0;
+                *token = "".to_string();
+                
             }
 
             else if c == self.file.to_string().len()-1 { // end of file
@@ -94,7 +83,7 @@ impl Scanner {
 
             else if self.file.chars().nth(c).unwrap() == ' ' {  // float Foo  "_ _ _ _"
                 
-
+                flag_cont_operator = 0;
                 // if whitespace in the middle, e.g. float_Foo
                 // push float
                 let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
@@ -112,76 +101,49 @@ impl Scanner {
 
             
             else if operators.contains(&&*(self.file.chars().nth(c).unwrap().to_string()).to_string()) {
-                println!("cflag_cont_operator: {}", flag_cont_operator);
-                println!("char_pos::::::{}", self.char_pos);
+                
+                // Foo(int 
+                if flag_cont_operator == 0 {
+                    flag_cont_operator = flag_cont_operator + 1;
+                    // push Foo
+                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
+                    self.all_tokens.push(token_obj);
 
-                flag_space = 1;
+                    // push operator
+                    *token = "".to_string();
+                    self.char_pos = char_index;
+                    token.push(self.file.chars().nth(c).unwrap());
+                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
+                    self.all_tokens.push(token_obj);
+                    char_index = char_index + 1;
+                    self.char_pos = char_index;
+                    *token = "".to_string();
 
+
+                    
+                } 
                 // if continuous operators (){ 
-                if flag_cont_operator != 0 {
-                    *token = "".to_string();
-                    self.char_pos = char_index; 
-                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
-                    self.all_tokens.push(token_obj);
-                    char_index = char_index + 1;
-                    flag_cont_operator = flag_cont_operator + 1;
-                    *token = "".to_string();
-                    continue;
-                }
-
-
-                // edge case: operator followed by another operator, e.g. val);
-                else if token == "" {
+                else if flag_cont_operator != 0 {
+            
+                    // ( already in, push )
                     token.push(self.file.chars().nth(c).unwrap());
                     let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
                     self.all_tokens.push(token_obj);
-                    self.char_pos = char_index; 
-                    char_index = char_index + 1;
-                    *token = "".to_string();
                     flag_cont_operator = flag_cont_operator + 1;
+                    *token = "".to_string();
+                    self.char_pos = char_index;
 
-                    continue;
-                    
+                   
+
                 }
 
-                                // if first operator, e.g. val);
-                // else if flag_cont_operator == 0 {
-                //     let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
-                //     self.all_tokens.push(token_obj);
-                //     *token = "".to_string();
-                //     self.char_pos = char_index;
-                //     char_index = char_index + 1;
-                //     flag_cont_operator = flag_cont_operator + 1;
-                    
-                //     continue;
 
-                // }
-
-
-                else {
-
-                    // Foo(int
-                    // token before operator
-                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
-                    self.all_tokens.push(token_obj);
-                    
-                    // operator
-                    *token = "".to_string();
-                    self.char_pos = char_index; 
-                    char_index = char_index + 1;
-                    token.push(self.file.chars().nth(c).unwrap());
-                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
-                    self.all_tokens.push(token_obj);
-                    
-                    // set var for next token
-                    flag_space = 0;
-                    *token = "".to_string();
-                    self.char_pos = char_index; 
-                }
 
             }
 
             else if (self.file.chars().nth(c).unwrap()).is_alphanumeric() || self.file.chars().nth(c).unwrap().to_string() == "." || self.file.chars().nth(c).unwrap().to_string() == "_" {
+                
+                flag_cont_operator = 0;
                 // first non whitespace char, e.g. _ _ _ _ float
                 if flag_space == 0 && char_index == -1 {
                     char_index = char_index + 1;
