@@ -5,6 +5,7 @@
 mod Token;
 mod Cstream;
 mod Scanner;
+mod Parser;
 //use Scanner::Scanner;
 // pub use new
 
@@ -12,7 +13,7 @@ fn main (){
     let file = Cstream::run();
     let mut ex = Scanner::Scanner::new(file.to_string());
     let all_tokens = ex.get_all_tokens();
-    let mut parser = Parser::Parser::new(all_tokens);
+    let mut parser = Parser::Parser::new((&all_tokens).to_vec());
     let boolean = parser.Program();
     // for i in 0..all_tokens.len() {
     //     println!("--------------------------");
