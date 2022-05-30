@@ -4,8 +4,8 @@ use crate::Token::TokenType;
 use crate::Cstream::CStream;
 use custom_error::custom_error;
 
-custom_error!{MyError
-    General{line_num:i32, char_pos:i32} = "Error"}
+// custom_error!{MyError
+//     General{line_num:i32, char_pos:i32} = "Error"}
 
 
 pub struct Scanner {
@@ -46,12 +46,12 @@ impl Scanner {
         let mut after_newline = 0;
 
 
-        println!("file len: {}", self.file.to_string().len());
+        //println!("file len: {}", self.file.to_string().len());
         //println!("last char: {}.", self.file.chars().nth(245).unwrap());
 
         // loop over the file char by char
         for c in 0..self.file.to_string().len() {
-            println!("c= {}", c);
+            //println!("c= {}", c);
             //println!("char: {}",self.file.chars().nth(c).unwrap());
             // check for newline
             if self.file.chars().nth(c).unwrap() == '\n' {
@@ -71,7 +71,7 @@ impl Scanner {
             }
 
             else if c == self.file.to_string().len()-2 { // end of file
-                println!("end of file, cur char is {}",self.file.chars().nth(c).unwrap());
+                //println!("end of file, cur char is {}",self.file.chars().nth(c).unwrap());
                 flag_cont_operator = 0;
                 after_newline = 0;
 
