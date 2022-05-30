@@ -1,3 +1,0 @@
-
-float Foo(int val, ) {
-}
