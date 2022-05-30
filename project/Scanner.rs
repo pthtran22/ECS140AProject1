@@ -148,8 +148,10 @@ impl Scanner {
 
             
             else if operators.contains(&&*(self.file.chars().nth(c).unwrap().to_string()).to_string()) {
-                //if operator at the end of line, e.g. }/n
+               
             
+
+                //if operator at the end of line, e.g. }/n
                 if after_newline == 1 {
                     // push ; current operator
                     if char_index == -1 {
@@ -172,29 +174,6 @@ impl Scanner {
                     
                     continue;
                 }
-
-                //     // Foo(7); cur index on ;
-                //     if after_newline == 0 {
-
-                //         token.push(self.file.chars().nth(c).unwrap());
-
-                //         println!("char pos: {} and char : {}", self.char_pos,self.file.chars().nth(c).unwrap());
-                //         let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
-                //         self.all_tokens.push(token_obj);
-
-                //         flag_cont_operator = 0;
-                //         after_newline = 1;
-        
-                //         //self.line_num += 1;
-                //         char_index = char_index + 1;
-                //         flag_space = 0;
-                //         flag_cont_operator = 0;
-                //         *token = "".to_string();
-                        
-                //         continue;
-
-                //     }
-                // }
 
 
                 after_newline = 0;
