@@ -46,13 +46,13 @@ impl Scanner {
         let mut after_newline = 0;
 
 
-        
+        println!("file len: {}", self.file.to_string().len());
+        //println!("last char: {}.", self.file.chars().nth(245).unwrap());
 
         // loop over the file char by char
         for c in 0..self.file.to_string().len() {
-            // println!("char pos {}", self.char_pos);
-            // println!("char index {}", char_index);
-            // println!("char: {}", self.file.chars().nth(c).unwrap());
+            println!("c= {}", c);
+            //println!("char: {}",self.file.chars().nth(c).unwrap());
             // check for newline
             if self.file.chars().nth(c).unwrap() == '\n' {
                 flag_cont_operator = 0;
@@ -63,25 +63,50 @@ impl Scanner {
                 flag_space = 0;
                 flag_cont_operator = 0;
                 *token = "".to_string();
+                // if c == self.file.to_string().len()-1 {
+                //     // go back, return the vector <all_tokens>
+                //     return &mut self.all_tokens;
+                // }
                 
             }
 
-            else if c == self.file.to_string().len()-1 { // end of file
+            else if c == self.file.to_string().len()-2 { // end of file
+                println!("end of file, cur char is {}",self.file.chars().nth(c).unwrap());
                 flag_cont_operator = 0;
                 after_newline = 0;
-                if flag_space == 0 {
-                    self.char_pos = char_index;
+
+                // if file ends with newline
+                if self.file.chars().nth(c).unwrap() == '\n' {
+                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
+                    self.all_tokens.push(token_obj);
+                    return &mut self.all_tokens;
                 }
-                token.push_str(&self.file.chars().nth(c).unwrap().to_string()); // }
-                //token = + &file.chars().nth(c).unwrap().to_string();
-                //go back, for now assume the last char would always be '}'
-                char_index = char_index + 1;
-                self.char_pos = char_index;
-                let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
-                self.all_tokens.push(token_obj);
-                
-                // go back, return the vector <all_tokens>
-                return &mut self.all_tokens;
+                // if file ends with operator
+                else {
+                    // push whatever before operator
+                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
+                    self.all_tokens.push(token_obj);
+                    *token = "".to_string();
+                    char_index = char_index + 1;
+                    self.char_pos = char_index;
+
+                    // push the last operator
+                    token.push_str(&self.file.chars().nth(c).unwrap().to_string()); 
+                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
+                    self.all_tokens.push(token_obj);
+
+                    // go back, return the vector <all_tokens>
+                    return &mut self.all_tokens;
+
+                }
+
+
+
+
+                // if flag_space == 0 {
+                //     self.char_pos = char_index;
+                // }
+
             }
 
             else if self.file.chars().nth(c).unwrap() == ' ' {  // float Foo  "_ _ _ _"
@@ -123,6 +148,55 @@ impl Scanner {
 
             
             else if operators.contains(&&*(self.file.chars().nth(c).unwrap().to_string()).to_string()) {
+                //if operator at the end of line, e.g. }/n
+            
+                if after_newline == 1 {
+                    // push ; current operator
+                    if char_index == -1 {
+                        char_index = char_index + 1;
+                    }
+                    token.push(self.file.chars().nth(c).unwrap());
+                    self.char_pos = char_index;
+
+                    let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
+                    self.all_tokens.push(token_obj);
+
+                    flag_cont_operator = 0;
+                    after_newline = 0;
+    
+                    char_index = char_index + 1;
+                    self.char_pos = char_index;
+                    flag_space = 0;
+                    flag_cont_operator = 0;
+                    *token = "".to_string();
+                    
+                    continue;
+                }
+
+                //     // Foo(7); cur index on ;
+                //     if after_newline == 0 {
+
+                //         token.push(self.file.chars().nth(c).unwrap());
+
+                //         println!("char pos: {} and char : {}", self.char_pos,self.file.chars().nth(c).unwrap());
+                //         let token_obj: Token = self.get_cur_token(token, self.line_num, self.char_pos);
+                //         self.all_tokens.push(token_obj);
+
+                //         flag_cont_operator = 0;
+                //         after_newline = 1;
+        
+                //         //self.line_num += 1;
+                //         char_index = char_index + 1;
+                //         flag_space = 0;
+                //         flag_cont_operator = 0;
+                //         *token = "".to_string();
+                        
+                //         continue;
+
+                //     }
+                // }
+
+
                 after_newline = 0;
                 // Foo(int or value_=_Foo
                 if flag_cont_operator == 0 {
