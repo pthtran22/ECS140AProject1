@@ -53,6 +53,5 @@ pub fn run() -> String {
     let mut ex = CStream::new(filename);
 	ex.set_content();
     ex.get_content()
-    
-// 	println!("{}", ex.content);
+    println!("{}", ex.content);
 }
