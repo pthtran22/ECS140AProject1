@@ -13,6 +13,30 @@ fn main (){
     let file = Cstream::run();
     let mut ex = Scanner::Scanner::new(file.to_string());
     let all_tokens = ex.get_all_tokens();
+        
+    // check if there's ==, >=, <=, !=
+    for i in 0..all_tokens.len()-1 {
+        if i > 0 && all_tokens[i].text == "=" {
+            if all_tokens[i-1].text == "=" {
+                all_tokens.remove(i);
+                all_tokens[i-1].text = "==".to_string();
+            }
+            if all_tokens[i-1].text == ">" {
+                all_tokens.remove(i);
+                all_tokens[i-1].text = ">=".to_string();
+            }
+            if all_tokens[i-1].text == "<" {
+                all_tokens.remove(i);
+                all_tokens[i-1].text = "<=".to_string();
+            }
+            if all_tokens[i-1].text == "!" {
+                all_tokens.remove(i);
+                all_tokens[i-1].text = "!=".to_string();
+            }
+        }
+    }
+    
+    
     let mut parser = Parser::Parser::new((&all_tokens).to_vec());
     let boolean = parser.Program();
     // for i in 0..all_tokens.len() {
