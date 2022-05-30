@@ -1,5 +1,5 @@
 # ECS140AProject1
-## Annemarie Xia 916111274 xxixia@ucdavis.edu
+## Annemarie Xia xxixia@ucdavis.edu 916111274 
 ## Patricia Tran pthtran@ucdavis.edu 915908886
 
 
